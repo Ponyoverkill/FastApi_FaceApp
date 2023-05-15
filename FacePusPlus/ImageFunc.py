@@ -1,5 +1,8 @@
+import io
 import json
 import os
+import re
+from base64 import b64decode as dec64
 from PIL import Image
 import requests
 import schemas
@@ -8,7 +11,8 @@ from datetime import datetime
 '''
 delete_image - takes image's path in static/img directory and delete current image
 
-download_and_save_image - takes image's url, download it into static/img. Returning path to image
+save_image - takes image's file, base64 and url, and trying to save/decode&save/download&save into ./static/img
+Returning path to image
 
 delete_trash - delete images from static/img by paths in static/trash/trashlist
 
@@ -17,19 +21,50 @@ and return path to it
 
 '''
 
+
+def generate_path():
+    return './static/img/' + datetime.utcnow().strftime("%d-%m-%Y_%H-%M-%S_%f") + '.jpeg'
+
+
 def delete_image(image):
     os.remove(image)
 
 
-def download_and_save_image(url: str):
-    path = './static/img/' + datetime.utcnow().strftime("%d-%m-%Y_%H-%M-%S_%f") + '.jpeg'
+def base64_save_image(image: str):
+    path = generate_path()
+    image = dec64(re.sub('^data:image/.+;base64,', '', image))
+    new_image = Image.open(io.BytesIO(image))
+    new_image.save(path)
+    return path
+
+
+def file_save_image(image):
+    path = generate_path()
+    print(image)
+    new_image = Image.open(image)
+    new_image.save(path)
+    return path
+
+
+def url_save_image(url: str):
+    path = generate_path()
     try:
         resp = requests.get(url, stream=True).raw
         new_image = Image.open(resp)
         new_image.save(path)
         return path
     except:
-        return ValueError
+        return ConnectionError
+
+
+def save_image(image_file, image_base64, image_url):
+    if image_file:
+        path = file_save_image(image_file.file)
+    elif image_base64:
+        path = base64_save_image(image_base64)
+    elif image_url:
+        path = url_save_image(image_url)
+    return path
 
 
 def delete_trash():
@@ -43,6 +78,7 @@ def delete_trash():
 
 
 def draw(image: schemas.Image, color: str):
+    delete_trash()
     new_image = Image.open(image.img)
     for i in json.loads(image.faces):
         width = i['face_rectangle']['width']

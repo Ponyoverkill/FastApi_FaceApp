@@ -2,9 +2,8 @@ from pydantic import BaseModel
 
 
 class ImageBase(BaseModel):
-    img: str | bytes
+    img: str
     faces: str
-    pass
 
 
 class Image(ImageBase):
