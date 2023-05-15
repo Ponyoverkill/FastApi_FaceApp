@@ -13,10 +13,10 @@ services:
       context: .
     env_file:
       - .env
-    container_name: faceapp
+    container_name: face_app
+    command: ["/FaceApp/app.sh"]
     ports:
       - 1234:8000
     depends_on:
       - db
-    command: ["/FaceApp/app.sh"]
 
