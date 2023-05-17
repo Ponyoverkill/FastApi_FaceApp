@@ -34,6 +34,7 @@ def create_img(path, faces: dict):
         db.commit()
         db.refresh(db_image)
         id = {'id': db_image.id}
+        db.close()
         return json.dumps(id)
     except:
         return ConnectionError
@@ -50,6 +51,7 @@ def update_img(image: schemas.Image):
             db_image.faces = json.dumps(image.faces)
             db.add(db_image)
             db.commit()
+            db.close()
         return 'Success update!'
     except:
         return ValueError
@@ -61,6 +63,7 @@ def get_img(id: int):
         db_image = db.query(database.Image).filter_by(id=id).one()
         j = json.dumps({'id': db_image.id, 'img': db_image.image, 'faces': db_image.faces})
         img = Image.parse_raw(j)
+        db.close()
         return img
     except:
         raise ValueError
@@ -74,6 +77,7 @@ def delete_img(id):
             delete_image(db_image.image)
             db.delete(db_image)
             db.commit()
+            db.close()
     except:
         return ValueError
 
