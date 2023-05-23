@@ -18,8 +18,7 @@ app = FastAPI()
 async def post_image(image_url: str = None, image_base64: str = None, image_file: UploadFile = None):
         try:
             res = await face_detect(image_file, image_base64, image_url)
-            if 'faces' in res:
-                print(res)
+            if 'faces' in res:                
                 path = save_image(image_file, image_base64, image_url)
                 id = create_img(path, res['faces'])
                 return id
@@ -56,8 +55,7 @@ def get_image(id, color: str = ''):
 async def put_image(id: int, image_url: str = None, image_base64: str = None, image_file: UploadFile = None):
         try:
             res = await face_detect(image_file, image_base64, image_url)
-            if 'faces' in res:
-                print(res)
+            if 'faces' in res:                
                 image = get_img(id)
                 image.img = save_image(image_file, image_base64, image_url)
                 image.faces = res['faces']
