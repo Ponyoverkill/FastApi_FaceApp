@@ -43,8 +43,7 @@ def create_img(path, faces: dict):
 def update_img(image: schemas.Image):
     try:
         db = init_session()
-        db_image = db.query(database.Image).filter_by(id=image.id).one()
-        print(db_image.image, image.img)
+        db_image = db.query(database.Image).filter_by(id=image.id).one()       
         if db_image != []:
             delete_image(db_image.image)
             db_image.image = image.img
